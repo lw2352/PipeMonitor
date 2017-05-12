@@ -1,0 +1,244 @@
+
+ 
+记录时间：2017-05-03 16:51:43,400 
+线程ID:[11] 
+日志级别：  DEBUG 
+错误描述：2017-05-03 16:51:43.397从硬件192.168.1.169:41374接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:51:45,245 
+线程ID:[13] 
+日志级别：  DEBUG 
+错误描述：2017-05-03 16:51:45.245从硬件192.168.1.169:41374接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:51:46,265 
+线程ID:[13] 
+日志级别：  DEBUG 
+错误描述：2017-05-03 16:51:46.262从硬件192.168.1.169:41374接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:51:46,933 
+线程ID:[13] 
+日志级别：  DEBUG 
+错误描述：2017-05-03 16:51:46.932从硬件192.168.1.169:41374接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:51:51,459 
+线程ID:[12] 
+日志级别：  DEBUG 
+错误描述：2017-05-03 16:51:51.458从硬件192.168.1.169:41374接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:51:51,830 
+线程ID:[12] 
+日志级别：  DEBUG 
+错误描述：2017-05-03 16:51:51.829从硬件192.168.1.169:41374接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:51:52,312 
+线程ID:[12] 
+日志级别：  DEBUG 
+错误描述：2017-05-03 16:51:52.312从硬件192.168.1.169:41374接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:51:52,645 
+线程ID:[12] 
+日志级别：  DEBUG 
+错误描述：2017-05-03 16:51:52.644从硬件192.168.1.169:41374接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:51:52,978 
+线程ID:[12] 
+日志级别：  DEBUG 
+错误描述：2017-05-03 16:51:52.976从硬件192.168.1.169:41374接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:51:53,296 
+线程ID:[12] 
+日志级别：  DEBUG 
+错误描述：2017-05-03 16:51:53.293从硬件192.168.1.169:41374接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:51:53,618 
+线程ID:[12] 
+日志级别：  DEBUG 
+错误描述：2017-05-03 16:51:53.617从硬件192.168.1.169:41374接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:51:53,959 
+线程ID:[12] 
+日志级别：  DEBUG 
+错误描述：2017-05-03 16:51:53.958从硬件192.168.1.169:41374接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:51:54,304 
+线程ID:[12] 
+日志级别：  DEBUG 
+错误描述：2017-05-03 16:51:54.303从硬件192.168.1.169:41374接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:51:55,382 
+线程ID:[13] 
+日志级别：  DEBUG 
+错误描述：System.ObjectDisposedException: 无法访问已释放的对象。
+对象名:“System.Net.Sockets.Socket”。
+   在 System.Net.Sockets.Socket.BeginReceive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags, SocketError& errorCode, AsyncCallback callback, Object state)
+   在 System.Net.Sockets.Socket.BeginReceive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags, AsyncCallback callback, Object state)
+   在 pipemonitor.Net_Device.OnReceive(IAsyncResult ar) 位置 F:\LW_files\修正\pipemonitor\pipemonitor\Net_Device.cs:行号 423
+ 
+
+ 
+记录时间：2017-05-03 16:52:11,395 
+线程ID:[13] 
+日志级别：  DEBUG 
+错误描述：2017-05-03 16:52:11.394从硬件192.168.1.169:41519接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:52:14,595 
+线程ID:[13] 
+日志级别：  DEBUG 
+错误描述：2017-05-03 16:52:14.594从硬件192.168.1.169:41519接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:52:19,222 
+线程ID:[14] 
+日志级别：  DEBUG 
+错误描述：System.ObjectDisposedException: 无法访问已释放的对象。
+对象名:“System.Net.Sockets.Socket”。
+   在 System.Net.Sockets.Socket.BeginReceive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags, SocketError& errorCode, AsyncCallback callback, Object state)
+   在 System.Net.Sockets.Socket.BeginReceive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags, AsyncCallback callback, Object state)
+   在 pipemonitor.Net_Device.OnReceive(IAsyncResult ar) 位置 F:\LW_files\修正\pipemonitor\pipemonitor\Net_Device.cs:行号 423
+ 
+
+ 
+记录时间：2017-05-03 16:59:48,286 
+线程ID:[10] 
+日志级别：  DEBUG 
+错误描述：在2017-05-03 16:59:48.282从硬件192.168.1.169:43760接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:59:56,344 
+线程ID:[10] 
+日志级别：  DEBUG 
+错误描述：在2017-05-03 16:59:56.342从硬件192.168.1.169:43760接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:59:56,956 
+线程ID:[9] 
+日志级别：  DEBUG 
+错误描述：在2017-05-03 16:59:56.950从硬件192.168.1.169:43760接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:59:58,529 
+线程ID:[10] 
+日志级别：  DEBUG 
+错误描述：在2017-05-03 16:59:58.529从硬件192.168.1.169:43760接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:59:59,029 
+线程ID:[10] 
+日志级别：  DEBUG 
+错误描述：在2017-05-03 16:59:59.028从硬件192.168.1.169:43760接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 16:59:59,529 
+线程ID:[10] 
+日志级别：  DEBUG 
+错误描述：在2017-05-03 16:59:59.529从硬件192.168.1.169:43760接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 17:00:00,040 
+线程ID:[9] 
+日志级别：  DEBUG 
+错误描述：在2017-05-03 17:00:00.032从硬件192.168.1.169:43760接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 17:00:00,544 
+线程ID:[9] 
+日志级别：  DEBUG 
+错误描述：在2017-05-03 17:00:00.543从硬件192.168.1.169:43760接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 17:00:02,647 
+线程ID:[10] 
+日志级别：  DEBUG 
+错误描述：System.ObjectDisposedException: 无法访问已释放的对象。
+对象名:“System.Net.Sockets.Socket”。
+   在 System.Net.Sockets.Socket.BeginReceive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags, SocketError& errorCode, AsyncCallback callback, Object state)
+   在 System.Net.Sockets.Socket.BeginReceive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags, AsyncCallback callback, Object state)
+   在 pipemonitor.Net_Device.OnReceive(IAsyncResult ar) 位置 F:\LW_files\修正\pipemonitor\pipemonitor\Net_Device.cs:行号 423
+ 
+
+ 
+记录时间：2017-05-03 17:00:07,526 
+线程ID:[10] 
+日志级别：  DEBUG 
+错误描述：在2017-05-03 17:00:07.525从硬件192.168.1.169:43854接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 17:00:08,293 
+线程ID:[10] 
+日志级别：  DEBUG 
+错误描述：在2017-05-03 17:00:08.290从硬件192.168.1.169:43854接收到的数据长度是12数据是A5A5FF00000005FFFFFF5A5A
+
+ 
+
+ 
+记录时间：2017-05-03 17:00:08,915 
+线程ID:[10] 
+日志级别：  DEBUG 
+错误描述：System.ObjectDisposedException: 无法访问已释放的对象。
+对象名:“System.Net.Sockets.Socket”。
+   在 System.Net.Sockets.Socket.BeginReceive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags, SocketError& errorCode, AsyncCallback callback, Object state)
+   在 System.Net.Sockets.Socket.BeginReceive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags, AsyncCallback callback, Object state)
+   在 pipemonitor.Net_Device.OnReceive(IAsyncResult ar) 位置 F:\LW_files\修正\pipemonitor\pipemonitor\Net_Device.cs:行号 423
+ 
