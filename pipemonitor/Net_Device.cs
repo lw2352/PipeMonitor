@@ -10,7 +10,7 @@ using System.Net.Sockets;
 using System.IO;
 using System.Timers;
 
-//ToDo: 1.在所有设备的22发上来后，关闭定时器，避免在上传过程中占用CPU资源
+//ToDo: 1.在所有设备的22发上来后，关闭定时器，避免在上传过程中占用CPU资源（完成）
 //      2.上层收到AD采样结束的22--55之后，把采样完成时间写入数据库，而不是记录上传时间
 //       （22指令的接收数据并发大，不考虑直接处理存入数据库，而是作为dataitem属性暂存）
 //      3.对于命令解析用switch效率高，对于所有设备的状态判断最好一次性查找哈希表弄完
@@ -263,7 +263,7 @@ namespace pipemonitor
                                 //把信息存入数据库
                                 Net_DB.addsensorinfo(intdeviceID, strIP, strPort, time, dataitem.isWaked);
 
-                                Log.Debug("地址"+strAddress+"已存储");
+                                Log.Debug("ID为"+intdeviceID+"--地址" +strAddress+"已存储");
                             }
                             else
                             {
@@ -746,7 +746,10 @@ namespace pipemonitor
                         i++;
                         dataitem.uploadGroup = j;//设置组属性
                         dataitem.CmdStage = 2;
-                        SendCmdSingle(CmdSetTempCloseTime(j, dataitem.strAddress), dataitem.byteDeviceID, dataitem.socket, 1);//设置暂时关闭时长
+                        if (j >= 1)//add 5-12 第0组不设置暂时关闭时长
+                        {
+                            SendCmdSingle(CmdSetTempCloseTime(j, dataitem.strAddress), dataitem.byteDeviceID, dataitem.socket, 1);//设置暂时关闭时长
+                        }
                     }
                     else
                     {
@@ -908,26 +911,6 @@ namespace pipemonitor
             Net_DB.addsensorad(intDeviceID, DateTime.Now.ToString(), path);
         }
 
-        //log 日志文件 add 3-6
-        //public void WriteLog(Type t, string ex)
-        //{
-
-            
-            //log.Error(ex);
-            //log.Debug(ex);
-
-        /*string outputfileName = @"D:\\Data\\" + "Log.txt";
-        using (FileStream fs = new FileStream(outputfileName, FileMode.Append))
-        {
-
-            using (StreamWriter writer = new StreamWriter(fs, Encoding.Unicode))
-            {
-                writer.Write(str);
-
-            } //using (StreamWriter writer = new StreamWriter(fs, Encoding.Unicode))
-        }  //using (FileStream fs = new FileStream(fileName, FileMode.Append))
-        */
-    //}
         #endregion 保存文件
 
         #region AD立即采样、获取进度（分阶段）、数据上传
@@ -1017,9 +1000,12 @@ namespace pipemonitor
             if (group == 0)
             {
                 //bytetime = intToBytes(group * 30 * 2);
-                bytetime = intToBytes(2);//第0组关闭1分钟
-                Cmd[11] = bytetime[0];
-                Cmd[12] = bytetime[1];
+                //bytetime = intToBytes(2);//第0组关闭时长1分钟
+                //Cmd[11] = bytetime[0];
+                //Cmd[12] = bytetime[1];
+                //测试，第0组关闭时长不变 5-12
+                Cmd[11] = (byte)(2 * dataitem.CloseTime >> 8);
+                Cmd[12] = (byte)(2 * dataitem.CloseTime & 0xFF);
             }
             else
             {
