@@ -321,6 +321,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="log4net.config" />
+    <None Include="Properties\PublishProfiles\1.pubxml" />
     <None Include="Properties\PublishProfiles\test.pubxml" />
   </ItemGroup>
   <PropertyGroup>

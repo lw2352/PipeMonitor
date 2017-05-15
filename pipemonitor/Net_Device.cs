@@ -421,9 +421,14 @@ namespace pipemonitor
 
                     if (checkIsAllCmdStage3())
                     {
-                        //可以进行数据分析了
-                        //htClient.Clear();
-                        Log.Debug("所有设备数据传完");
+                        foreach (DictionaryEntry de in htClient)
+                        {
+                            DataItem dataitem1 = (DataItem)de.Value;
+                            if (dataitem1.CmdStage == 3)//add 5-13
+                                dataitem.CmdStage = 0;
+                        }
+                        
+                        Log.Debug("所有设备数据传完,CmdStage置0");
                     }
 
                     if (checkIsAllOffLine())//add 5-11
