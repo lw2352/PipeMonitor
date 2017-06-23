@@ -414,7 +414,7 @@ namespace pipemonitor
             MySqlParameter[] parmss = null;
             string strSQL = "";
             bool IsDelSuccess = false;
-            strSQL = "CREATE TABLE dbvpipe."+ childName + "(DataID INT AUTO_INCREMENT, DataDate VARCHAR(45), DataPath VARCHAR(45), PRIMARY KEY (`DataID`));";//建立新表
+            strSQL = "CREATE TABLE "+ childName + "(DataID INT AUTO_INCREMENT, DataDate VARCHAR(45), DataPath VARCHAR(45), PRIMARY KEY (`DataID`));";//建立新表
             /*parmss = new MySqlParameter[]
                                      {
                                          new MySqlParameter("?sensorChildTable", MySqlDbType.VarChar)
