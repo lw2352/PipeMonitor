@@ -29,7 +29,7 @@ namespace pipemonitor
         public byte[] byteDeviceID; //这个是设备的ID的byte数组
         public int intDeviceID;    //转化为int后的ID
         public int currentsendbulk; //当前发送的包数
-        //public int totalsendbulk; //总发送的包数
+
         public Socket socket;   //Socket of the client
         public bool isSendDataToServer;//发送数据到服务器
         //public bool isChoosed;
@@ -49,27 +49,86 @@ namespace pipemonitor
 
         public byte[] SingleBuffer;
         public string strAddress;
+
+        //pc-3个
+        public byte[] byteTimeStamp;//时间戳
+        public double Longitude;//经度，后半段
+        public double Latitude;//纬度， 前半段
     }
 
     public class CmdItem
     {
-        public byte[] CmdReadGpsTime = new byte[] { 0xA5, 0xA5, 0x25, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x04, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x5A, 0x5A };//读取GPS采样时间
-        public byte[] CmdSetCapTime = new byte[] { 0xA5, 0xA5, 0x25, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x04, 0x0A, 0x1E, 0x00, 0x00, 0xFF, 0x5A, 0x5A }; //设定GPS采样时间,byte[9]是小时，byte[10]是分钟
-        //public byte[] CmdSetOpenTime  = new byte[] { 0xA5, 0xA5, 0x26, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x02, 0xFF, 0xFF, 0xFF, 0x5A, 0x5A };//设置开启时长
-        //public byte[] CmdSetCloseTime = new byte[] { 0xA5, 0xA5, 0x27, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x02, 0x00, 0x00, 0xFF, 0x5A, 0x5A };//设置关闭时长
-        //public byte[] CmdADNow        = new byte[] { 0xA5, 0xA5, 0x22, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x01, 0xFF, 0xFF, 0x5A, 0x5A };//立即采样
-        public byte[] CmdSetOpenAndCloseTime = new byte[] { 0xA5, 0xA5, 0x26, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x04, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x5A, 0x5A };//设置开启和关闭时长
+        //(数据位用0xFF填充)
+        //上传AD数据包--0x23
+        public byte[] CmdADPacket = new byte[] { 0xA5, 0xA5, 0x23, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x06, 0x02, 0x57, 0xFF, 0xFF, 0x03, 0xE8, 0xFF, 0x5A, 0x5A };
+        //设定GPS采样时间,byte[9]是小时，byte[10]是分钟--0x25
+        public byte[] CmdSetCapTime = new byte[] { 0xA5, 0xA5, 0x25, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x04, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x5A, 0x5A };
+        public byte[] CmdReadCapTime = new byte[] { 0xA5, 0xA5, 0x25, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x04, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x5A, 0x5A };
+        //设置开启和关闭时长--0x26
+        public byte[] CmdSetOpenAndCloseTime = new byte[] { 0xA5, 0xA5, 0x26, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x04, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x5A, 0x5A };
+        public byte[] CmdReadOpenAndCloseTime = new byte[] { 0xA5, 0xA5, 0x26, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x04, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x5A, 0x5A };
+        //读取经纬度--0x27
+        public byte[] CmdReadGPSData = new byte[] { 0xA5, 0xA5, 0x27, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0x5A, 0x5A };
+
+
+        //(数据位用0x00填充)     
+        //设置/读取服务器IP
+        public byte[] CmdSetServerIP = new byte[] { 0xA5, 0xA5, 0x29, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x04, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x5A, 0x5A };
+        public byte[] CmdReadServerIP = new byte[] { 0xA5, 0xA5, 0x29, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x5A, 0x5A };
+        //设置/读取服务器端口号
+        public byte[] CmdSetServerPort = new byte[] { 0xA5, 0xA5, 0x30, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x02, 0x00, 0x00, 0xFF, 0x5A, 0x5A };
+        public byte[] CmdReadServerPort = new byte[] { 0xA5, 0xA5, 0x30, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x02, 0x00, 0x00, 0xFF, 0x5A, 0x5A };
+
+        //设置/读取AP名--0x31
+        public byte[] CmdSetAPssid = new byte[] { 0xA5, 0xA5, 0x31, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x5A, 0x5A };
+        public byte[] CmdReadAPssid = new byte[] { 0xA5, 0xA5, 0x31, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x5A, 0x5A };
+        //设置AP的密码--0x32
+        public byte[] CmdSetAPpassword = new byte[] { 0xA5, 0xA5, 0x32, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x5A, 0x5A };
+        public byte[] CmdReadAPpassword = new byte[] { 0xA5, 0xA5, 0x32, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x5A, 0x5A };
+        //让设备重新联网--0x33
+        public byte[] CmdReconnectTcp = new byte[] { 0xA5, 0xA5, 0x33, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x01, 0xFF, 0xFF, 0x5A, 0x5A };
+    }
+
+    public class GPSDistance
+    {
+        private const double EARTH_RADIUS = 6378.137 * 1000;//地球半径，单位为米
+        private static double rad(double d)
+        {
+            return d * Math.PI / 180.0;
+        }
+
+        public void getGPSData(int[] gpsData, out double latitude, out double longitude)
+        {
+            latitude = (gpsData[1] - 0x30) * 10.0 + (gpsData[2] - 0x30);
+
+            latitude += ((gpsData[3] - 0x30) * 10 + (gpsData[4] - 0x30)) / 60.0;
+
+            latitude += ((gpsData[6] - 0x30) / 10.0 + (gpsData[7] - 0x30) / 100.0 + (gpsData[8] - 0x30) / 1000.0 + (gpsData[9] - 0x30) / 10000.0 + (gpsData[10] - 0x30) / 100000.0) / 60.0;
+
+            longitude = (gpsData[12] - 0x30) * 100 + (gpsData[13] - 0x30) * 10 + (gpsData[14] - 0x30);
+
+            longitude += ((gpsData[15] - 0x30) * 10 + (gpsData[16] - 0x30)) / 60.0;
+
+            longitude += ((gpsData[18] - 0x30) / 10.0 + (gpsData[19] - 0x30) / 100.0 + (gpsData[20] - 0x30) / 1000.0 + (gpsData[21] - 0x30) / 10000.0 + (gpsData[22] - 0x30) / 100000.0) / 60.0;
+        }
+
+        public double getGpsDistance(double lat1, double lng1, double lat2, double lng2)
+        {
+            double radLat1 = rad(lat1);
+            double radLat2 = rad(lat2);
+            double a = radLat1 - radLat2;
+            double b = rad(lng1) - rad(lng2);
+
+            double s = 2 * Math.Asin(Math.Sqrt(Math.Pow(Math.Sin(a / 2), 2) +
+             Math.Cos(radLat1) * Math.Cos(radLat2) * Math.Pow(Math.Sin(b / 2), 2)));
+            s = s * EARTH_RADIUS;
+            s = Math.Round(s * 10000) / 10000;
+            return s;
+        }
     }
 
     public class Net_Device
     {
-        //public delegate void UpdateStatusDelegate(string status);//使用安全方法来更新控件
-        //public string IP = "192.168.1.104";//服务端的IP地址
-        public string IP = "120.25.229.254";//服务端的IP地址
-        public int Port = 8085; //服务器端口地址
-        //public int Port = 8080;
-        //public byte[] buffer = new byte[1002]; //临时缓冲区
-        //public byte[] buffer = new byte[1008]; //临时缓冲区
         public int perPackageLength = 1008;//每包的长度
         public static int g_datafulllength = 600000; //完整数据包的一个长度
         public static int g_totalPackageCount = 600; //600个包
@@ -77,13 +136,14 @@ namespace pipemonitor
         public static Socket ServerSocket; //The main socket on which the server listens to the clients
         public static System.Timers.Timer cmdTimer = new System.Timers.Timer();
         public static CmdItem cmdItem = new CmdItem();//实例化
+        public static GPSDistance gpsDistance = new GPSDistance();
         public static int currentUploadGroup = 0;//当前第几组上传
 
         public static log4net.ILog Log = log4net.LogManager.GetLogger(typeof(Net_Device));
 
         #region 开启和关闭服务
         //开启服务
-        public void OpenServer()
+        public void OpenServer(string ip, int port)
         {
             try
             {
@@ -96,7 +156,7 @@ namespace pipemonitor
                                                  ProtocolType.Tcp);
 
                 //Assign the any IP of the machine and listen on port number 8080
-                IPEndPoint ipEndPoint = new IPEndPoint(IPAddress.Parse(IP), Port);
+                IPEndPoint ipEndPoint = new IPEndPoint(IPAddress.Parse(ip), port);
 
                 //Bind and listen on the given address
                 ServerSocket.Bind(ipEndPoint);
@@ -119,7 +179,6 @@ namespace pipemonitor
 
         public void CloseServer()
         {
-            //ServerSocket.Close();//用循环关闭哈希表中的socket
             try
             {
                 foreach (DictionaryEntry de in htClient)
@@ -195,6 +254,7 @@ namespace pipemonitor
             byte[] ID = new byte[4];//设备的ID号
             int intdeviceID = 0;
             int[] cfg = new int[5];//存储从数据库读取的设备配置参数
+            string msg = "";
             try
             {
                 Socket clientSocket = (Socket)ar.AsyncState;//此处获取数据大小              
@@ -214,180 +274,229 @@ namespace pipemonitor
                     string strrec = str.Substring(0, bytesRead * 2);
                     System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "从硬件" + strAddress + "设备号--" + dataitem.intDeviceID + "接收到的数据长度是" + bytesRead.ToString() + "数据是" + strrec + "\n"); //把接收的数据打印出来
 
-                    if (checkIsHeartPackage(dataitem.SingleBuffer))
+                    switch (dataitem.SingleBuffer[2])
                     {
-                        if (dataitem.intDeviceID == 0)//只判断新地址的心跳包，避免重复检测
-                        {
-                            //设备的ID字符串
-                            ID[0] = dataitem.SingleBuffer[3];
-                            ID[1] = dataitem.SingleBuffer[4];
-                            ID[2] = dataitem.SingleBuffer[5];
-                            ID[3] = dataitem.SingleBuffer[6];
-                            intdeviceID = byteToInt(ID);
-
-                            string oldAddress = checkIsHaveID(intdeviceID);//得到当前ID对应的旧地址
-
-                            if (oldAddress != null)//若存在，把旧地址的属性复制到新地址上
-                            {//！！！由于掉线，新dataitem属性要继承旧设备，只需要更新网络属性，如IP、port、socket等
-                                DataItem olddataitem = (DataItem)htClient[oldAddress];//取出当前数据IP对应的dataitem
-
-                                dataitem.byteDeviceID = ID;
-                                dataitem.intDeviceID = intdeviceID;
-                                dataitem.strIP = strIP;
-                                dataitem.strPort = strPort;
-                                dataitem.datalength = olddataitem.datalength;//继承旧属性
-                                dataitem.socket = clientSocket;
-                                dataitem.byteAllData = olddataitem.byteAllData;//继承旧属性
-                                dataitem.currentsendbulk = olddataitem.currentsendbulk;//继承旧属性
-                                dataitem.uploadGroup = olddataitem.uploadGroup;//继承旧属性
-                                dataitem.isGetADNow = olddataitem.isGetADNow;
-                                dataitem.isWaked = 1;
-                                dataitem.CmdStage = olddataitem.CmdStage;//继承旧属性
-                                dataitem.isSendDataToServer = olddataitem.isSendDataToServer;//继承旧属性
-                                dataitem.CmdNum = olddataitem.CmdNum;//继承旧属性
-                                dataitem.SingleBuffer = new byte[perPackageLength];
-                                dataitem.strAddress = strAddress;
-                                //cfg = Net_DB.readsensorcfg(intdeviceID);//从数据库读取设备的配置参数
-                                //if (cfg != null)
-                                //{
-                                dataitem.CmdbulkHex = olddataitem.CmdbulkHex;//要发送的命令数目--16进制//继承旧属性
-                                dataitem.CapTimeHour = olddataitem.CapTimeHour;//继承旧属性
-                                dataitem.CapTimeMinute = olddataitem.CapTimeMinute;//继承旧属性
-                                dataitem.OpenTime = olddataitem.OpenTime;//继承旧属性
-                                dataitem.CloseTime = olddataitem.CloseTime;//继承旧属性
-                                //}
-                                htClient.Remove(oldAddress);//删除旧地址的键值对
-                                htClient[strAddress] = dataitem;
-
-                                string time = DateTime.Now.ToString();
-                                //把信息存入数据库
-                                Net_DB.addsensorinfo(intdeviceID, strIP, strPort, time, dataitem.isWaked);
-
-                                Log.Debug("ID为"+intdeviceID+"--地址" +strAddress+"已存储");
+                        case 0x22:
+                            if (dataitem.SingleBuffer[9] == 0xAA)
+                            {
+                                msg = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "硬件" + strAddress + "设备号--" + dataitem.intDeviceID + "--AD采样开始" + "\n";
                             }
+                            else if (dataitem.SingleBuffer[9] == 0x55)
+                            {
+                                System.Diagnostics.Debug.WriteLine("AD采样结束,准备上传AD数据");
+                                //！！！在此处记录该设备的一套命令已发完，把CmdbulkHex置0；若所有设备的命令发完（包括AD采样），则关闭定时器
+                                dataitem.CmdStage = 1;
+
+                                Log.Debug("设备号为" + dataitem.intDeviceID + "AD采样结束,CmdStage设为1");
+                                //如果是立即采样，则采样完成后上传AD数据
+                                if (dataitem.isGetADNow == true)
+                                {
+                                    UploadADdata(dataitem.strAddress);
+                                }
+                            }
+
+                            break;
+
+                        case 0x23:
+                            if (bytesRead == perPackageLength)
+                            {
+                                dataitem.currentsendbulk++;
+
+                                for (int i = 7; i < perPackageLength - 1; i++)//将上传的包去掉头和尾的两个字节后，暂时存储在TotalData[]中
+                                {
+                                    dataitem.byteAllData[dataitem.datalength++] = dataitem.SingleBuffer[i];
+                                }
+                                if (dataitem.datalength == g_datafulllength)//1000*600 = 600000;
+                                {
+                                    StoreDataToFile(dataitem.intDeviceID, dataitem.byteAllData);
+                                    //复位变量
+                                    //dataitem.totalsendbulk = 0;
+                                    dataitem.currentsendbulk = 0;
+                                    dataitem.isSendDataToServer = false;
+                                    System.Diagnostics.Debug.WriteLine("数据采集完毕");
+                                    //progressBar1.Value = 0;
+                                    //！！！若所有设备的命令发完（包括AD采样），设置一个属性
+                                    //！！！还要加一个判断，若哈希表中的所有设备都已发完命令。就可以关闭定时器了
+                                    dataitem.CmdStage = 3;
+                                    //test
+                                    Log.Debug("设备号为" + dataitem.intDeviceID + "数据采集完毕,CmdStage设为3");
+                                    if (dataitem.isGetADNow == true)
+                                    {
+                                        //立即采样结束后恢复采样时刻
+                                        byte[] cmdCapTime = cmdItem.CmdSetCapTime;
+                                        cmdCapTime[9] = (byte)dataitem.CapTimeHour;
+                                        cmdCapTime[10] = (byte)dataitem.CapTimeMinute;
+                                        SendCmdSingle(cmdCapTime, dataitem.byteDeviceID, dataitem.socket, 1);
+
+                                        dataitem.isGetADNow = false;//立即采样的数据上传完成后，将属性复位为false
+                                    }
+                                }
+                            }
+
                             else
                             {
-                                //若不存在，属于全新地址，更新ID号
-                                dataitem.intDeviceID = intdeviceID;
-                                dataitem.byteDeviceID = ID;
-                                cfg = Net_DB.readsensorcfg(intdeviceID);//从数据库读取设备的配置参数
-                                if (cfg != null)
+                                for (int i = 368, j = 0; i <= 373; i++, j++)//时间戳
                                 {
-                                    dataitem.CmdbulkHex = cfg[0];//要发送的命令数目--16进制
-                                    dataitem.CapTimeHour = cfg[1];
-                                    dataitem.CapTimeMinute = cfg[2];
-                                    dataitem.OpenTime = cfg[3];
-                                    dataitem.CloseTime = cfg[4];
+                                    dataitem.byteTimeStamp[j] = (byte)(Convert.ToInt32(dataitem.SingleBuffer[i]) - 0x30);
                                 }
-                                //开启命令发送定时器
-                                if (cmdTimer.Enabled != true)
-                                    cmdTimer.Start();
+                                msg = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "硬件" + dataitem.strAddress + "设备号--" + dataitem.intDeviceID + "--时间戳是:" + byteToHexStr(dataitem.byteTimeStamp) + "\n";
 
-                                string time = DateTime.Now.ToString();
-                                //把信息存入数据库
-                                Net_DB.addsensorinfo(intdeviceID, strIP, strPort, time, dataitem.isWaked);
                             }
-                        }//if (dataitem.intDeviceID == 0)
-                    }//end if (checkIsHeartPackage()) 
-      
-                    //设备进入低功耗模式后，断开网络，从哈希表中移除
-                    //如果是暂时关闭，则不能从哈希表中移除
-                    if (checkIsOffLine(dataitem.SingleBuffer))
-                    {
-                        //更新数据库，把isWaked置0
-                        dataitem.isWaked = 0;
-                        Net_DB.addsensorinfo(dataitem.intDeviceID, strIP, strPort, DateTime.Now.ToString(), dataitem.isWaked);
-                        clientSocket.Shutdown(SocketShutdown.Both);
-                        clientSocket.Close();
-                        htClient.Remove(intdeviceID);
-                        System.Diagnostics.Debug.WriteLine("设备已断开连接,进入低功耗模式");
-                    }
-                    if (checkIsGPSsetOK(dataitem.SingleBuffer))
-                    {
-                        dataitem.CmdNum++;
-                        System.Diagnostics.Debug.WriteLine("设定GPS采样时间成功");
-                        Log.Debug("设备号为"+dataitem.intDeviceID+"设定GPS采样时间成功");
-                    }
-                    if (checkIsGPSReadOK(dataitem.SingleBuffer))
-                    {
-                        dataitem.CmdNum++;
-                        System.Diagnostics.Debug.WriteLine("读取GPS当前时间成功");
-                        Log.Debug("设备号为" + dataitem.intDeviceID + "读取GPS当前时间成功");
-                    }
-                    /*if (checkIsOpenTimeSetOK())
-                    {
-                        dataitem.CmdNum++;
-                        System.Diagnostics.Debug.WriteLine("开启时长设置成功");
-                    }*/
-                    if (checkIsOpenAndCloseTime(dataitem.SingleBuffer))
-                    {
-                        dataitem.CmdNum++;
-                        System.Diagnostics.Debug.WriteLine("关闭时长设置成功");
-                        Log.Debug("设备号为" + dataitem.intDeviceID + "关闭时长设置成功");
+                            break;
 
-                        //该设备需要设置或者查询的命令已发完，剩下的是上传
-                        dataitem.CmdbulkHex = 0;
-
-                    }
-                    if (checkIsADstart(dataitem.SingleBuffer))
-                    {
-                        //dataitem.CmdNum++;
-                        System.Diagnostics.Debug.WriteLine("AD采样开始");
-                    }
-
-                    //检查AD采样是否结束
-                    if (checkIsADfinished(dataitem.SingleBuffer))
-                    {
-                        System.Diagnostics.Debug.WriteLine("AD采样结束,准备上传AD数据");
-                        //！！！在此处记录该设备的一套命令已发完，把CmdbulkHex置0；若所有设备的命令发完（包括AD采样），则关闭定时器
-                        dataitem.CmdStage = 1;
-                        
-                        Log.Debug("设备号为" + dataitem.intDeviceID + "AD采样结束,CmdStage设为1");
-                        //如果是立即采样，则采样完成后上传AD数据
-                        if (dataitem.isGetADNow == true)
-                        {                           
-                            UploadADdata(dataitem.strAddress);
-                        }
-                        
-                    }
-
-                    //处理AD数据（收到纯数据时保存到一个60万大小的数组中）
-                    if (checkIsPureData(dataitem.SingleBuffer))
-                    {
-                        dataitem.currentsendbulk++;
-
-                        for (int i = 7; i < perPackageLength - 1; i++)//将上传的包去掉头和尾的两个字节后，暂时存储在TotalData[]中
-                        {
-                            dataitem.byteAllData[dataitem.datalength++] = dataitem.SingleBuffer[i];
-                        }
-                        if (dataitem.datalength == g_datafulllength)//1000*600 = 600000;
-                        {
-                            StoreDataToFile(dataitem.intDeviceID, dataitem.byteAllData);
-                            //复位变量
-                            //dataitem.totalsendbulk = 0;
-                            dataitem.currentsendbulk = 0;
-                            dataitem.isSendDataToServer = false;
-                            System.Diagnostics.Debug.WriteLine("数据采集完毕");
-                            //progressBar1.Value = 0;
-                            //！！！若所有设备的命令发完（包括AD采样），设置一个属性
-                            //！！！还要加一个判断，若哈希表中的所有设备都已发完命令。就可以关闭定时器了
-                            dataitem.CmdStage = 3;
-                            //test
-                            Log.Debug("设备号为" + dataitem.intDeviceID + "数据采集完毕,CmdStage设为3");
-                            if (dataitem.isGetADNow == true)
+                        case 0x25:
+                            if (dataitem.SingleBuffer[7] == 0)
                             {
-                                //立即采样结束后恢复采样时刻
-                                byte[] cmdCapTime = cmdItem.CmdSetCapTime;
-                                cmdCapTime[9] = (byte)dataitem.CapTimeHour;
-                                cmdCapTime[10] = (byte)dataitem.CapTimeMinute;
-                                SendCmdSingle(cmdCapTime, dataitem.byteDeviceID, dataitem.socket, 1);
-
-                                dataitem.isGetADNow = false;//立即采样的数据上传完成后，将属性复位为false
+                                dataitem.CmdNum++;
+                                System.Diagnostics.Debug.WriteLine("读取GPS当前时间成功");
+                                Log.Debug("设备号为" + dataitem.intDeviceID + "读取GPS当前时间成功");
                             }
-                        }
-                    }
+                            if (dataitem.SingleBuffer[9] == 0x55)
+                            {
+                                dataitem.CmdNum++;
+                                System.Diagnostics.Debug.WriteLine("设定GPS采样时间成功");
+                                Log.Debug("设备号为" + dataitem.intDeviceID + "设定GPS采样时间成功");
 
-                    if (checkIsAllCmdStage1())//所有设备采样完成，关闭定时器，可以进行上传了
+                            }
+
+                            break;
+
+                        case 0x26:
+                            if (dataitem.SingleBuffer[7] == 0x01)
+                            {
+                                dataitem.CmdNum++;
+                                System.Diagnostics.Debug.WriteLine("关闭时长设置成功");
+                                Log.Debug("设备号为" + dataitem.intDeviceID + "关闭时长设置成功");
+
+                                //该设备需要设置或者查询的命令已发完，剩下的是上传
+                                dataitem.CmdbulkHex = 0;
+
+                            }
+                            break;
+
+                        case 0x27:
+                            int[] gpsData = new int[23];
+                            for (int i = 0; i < 23; i++)
+                            {
+                                gpsData[i] = dataitem.SingleBuffer[9 + i];
+                            }
+                            gpsDistance.getGPSData(gpsData, out dataitem.Latitude, out dataitem.Longitude);
+                            msg = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "硬件" + strAddress + "设备号--" + dataitem.intDeviceID + "--经度为：" + dataitem.Longitude + "纬度为：" + dataitem.Latitude + "\n";
+
+                            break;
+
+                        case 0x29:
+                            msg = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "硬件" + strAddress + "设备号--" + dataitem.intDeviceID + "--设定服务器IP成功" + "\n";
+
+                            break;
+
+                        case 0x30:
+                            msg = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "硬件" + strAddress + "设备号--" + dataitem.intDeviceID + "--设定服务器端口号成功" + "\n";
+
+                            break;
+
+                        case 0x31:
+                            msg = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "硬件" + strAddress + "设备号--" + dataitem.intDeviceID + "--设定AP名称成功" + "\n";
+
+                            break;
+
+                        case 0x32:
+                            msg = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "硬件" + strAddress + "设备号--" + dataitem.intDeviceID + "--设定AP密码成功" + "\n";
+
+                            break;
+
+                        case 0xFF:
+                            if (dataitem.intDeviceID == 0)//只判断新地址的心跳包，避免重复检测
+                            {
+                                //设备的ID字符串
+                                ID[0] = dataitem.SingleBuffer[3];
+                                ID[1] = dataitem.SingleBuffer[4];
+                                ID[2] = dataitem.SingleBuffer[5];
+                                ID[3] = dataitem.SingleBuffer[6];
+                                intdeviceID = byteToInt(ID);
+
+                                string oldAddress = checkIsHaveID(intdeviceID);//得到当前ID对应的旧地址
+
+                                if (oldAddress != null)//若存在，把旧地址的属性复制到新地址上
+                                {//！！！由于掉线，新dataitem属性要继承旧设备，只需要更新网络属性，如IP、port、socket等
+                                    DataItem olddataitem = (DataItem)htClient[oldAddress];//取出当前数据IP对应的dataitem
+
+                                    dataitem.strIP = strIP;
+                                    dataitem.strPort = strPort;
+                                    dataitem.socket = clientSocket;
+                                    dataitem.SingleBuffer = new byte[perPackageLength];
+                                    dataitem.strAddress = strAddress;
+
+                                    dataitem.datalength = olddataitem.datalength;//继承旧属性
+                                    dataitem.byteAllData = olddataitem.byteAllData;//继承旧属性
+                                    dataitem.currentsendbulk = olddataitem.currentsendbulk;//继承旧属性
+
+                                    dataitem.byteDeviceID = ID;
+                                    dataitem.intDeviceID = intdeviceID;
+
+                                    dataitem.isSendDataToServer = olddataitem.isSendDataToServer;//继承旧属性
+                                                                                                 //dataitem.isChoosed = false;
+                                    dataitem.CmdStage = olddataitem.CmdStage;//继承旧属性
+                                    dataitem.uploadGroup = 0;
+
+                                    dataitem.byteTimeStamp = olddataitem.byteTimeStamp;//时间戳，继承旧属性
+                                    dataitem.Longitude = olddataitem.Longitude;//经度，后半段，继承旧属性
+                                    dataitem.Latitude = olddataitem.Latitude;//纬度， 前半段，继承旧属性
+
+                                    dataitem.uploadGroup = olddataitem.uploadGroup;//继承旧属性
+                                    dataitem.isGetADNow = olddataitem.isGetADNow;
+                                    dataitem.isWaked = 1;
+
+                                    dataitem.CmdbulkHex = olddataitem.CmdbulkHex;//要发送的命令数目--16进制//继承旧属性
+                                    dataitem.CapTimeHour = olddataitem.CapTimeHour;//继承旧属性
+                                    dataitem.CapTimeMinute = olddataitem.CapTimeMinute;//继承旧属性
+                                    dataitem.OpenTime = olddataitem.OpenTime;//继承旧属性
+                                    dataitem.CloseTime = olddataitem.CloseTime;//继承旧属性
+
+                                    htClient.Remove(oldAddress);//删除旧地址的键值对
+
+                                    htClient[strAddress] = dataitem;//把设备的IP和设备的dataitem对应地更新进哈希表
+
+                                    string time = DateTime.Now.ToString();
+                                    //把信息存入数据库
+                                    Net_DB.addsensorinfo(intdeviceID, strIP, strPort, time, dataitem.isWaked);
+
+                                    Log.Debug("ID为" + intdeviceID + "--地址" + strAddress + "已存储");
+                                }
+                                else
+                                {
+                                    //若不存在，属于全新地址，更新ID号
+                                    dataitem.intDeviceID = intdeviceID;
+                                    dataitem.byteDeviceID = ID;
+
+                                    cfg = Net_DB.readsensorcfg(intdeviceID);//从数据库读取设备的配置参数
+                                    if (cfg != null)
+                                    {
+                                        dataitem.CmdbulkHex = cfg[0];//要发送的命令数目--16进制
+                                        dataitem.CapTimeHour = cfg[1];
+                                        dataitem.CapTimeMinute = cfg[2];
+                                        dataitem.OpenTime = cfg[3];
+                                        dataitem.CloseTime = cfg[4];
+                                    }
+                                    //开启命令发送定时器
+                                    if (cmdTimer.Enabled != true)
+                                        cmdTimer.Start();
+
+                                    string time = DateTime.Now.ToString();
+                                    //把信息存入数据库
+                                    Net_DB.addsensorinfo(intdeviceID, strIP, strPort, time, dataitem.isWaked);
+                                }
+                            }//if (dataitem.intDeviceID == 0)
+                            break;
+
+                        default:
+                            break;
+                    }
+                
+            
+
+
+                if (checkIsAllCmdStage1())//所有设备采样完成，关闭定时器，可以进行上传了
                     {
                         cmdTimer.Stop();//add 5-12
                         Log.Debug("所有设备采样完成，关闭定时器,开始分组");
@@ -873,9 +982,6 @@ namespace pipemonitor
             }
             else
             {
-                //IPAddress clientIPAddress = (deviceSocket.RemoteEndPoint as IPEndPoint).Address;
-                //string ip = clientIPAddress.ToString();
-                //int intID = byteToInt(id);
                 string strAddress = deviceSocket.RemoteEndPoint.ToString();
                 DataItem dataitem = (DataItem)htClient[strAddress];//取出当前数据ID对应的dataitem
                 dataitem.CmdNum++;//不需要发送命令，仅CmdNum++
@@ -901,19 +1007,48 @@ namespace pipemonitor
 
         #region 保存文件
         //保存文件，16进制，封装开头是0xAA，结尾是0x55
-        public void StoreDataToFile(int intDeviceID, byte[] bytes)
+        public string StoreDataToFile(int intDeviceID, byte[] bytes)
         {
             string filename = DateTime.Now.ToString("yyyy-MM-dd") + "--" + DateTime.Now.Hour.ToString() + "-" + DateTime.Now.Minute.ToString() + "-" + DateTime.Now.Second.ToString() + "--" + intDeviceID.ToString();//以日期时间命名，避免文件名重复
             byte[] fileStartAndEnd = new byte[2] { 0xAA, 0x55 };//保存文件的头是AA，尾是55
-            string path = @"D:\\Data\\" + filename + ".dat";
-            FileStream F = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            F.Write(fileStartAndEnd, 0, 1);
-            F.Write(bytes, 0, bytes.Length);
-            F.Write(fileStartAndEnd, 1, 1);
-            F.Flush();
-            F.Close();
-            //StatusBox.Text = "文件保存成功";
-            Net_DB.addsensorad(intDeviceID, DateTime.Now.ToString(), path);
+            string url = "D:\\Data";
+
+            try
+            {
+                if (!Directory.Exists(url))//如果不存在就创建file文件夹　　             　　                
+                {
+
+                    Directory.CreateDirectory(url);//创建该文件夹　
+
+                    string path = @"D:\\Data\\" + filename + ".dat";
+                    FileStream F = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    F.Write(fileStartAndEnd, 0, 1);
+                    F.Write(bytes, 0, bytes.Length);
+                    F.Write(fileStartAndEnd, 1, 1);
+                    F.Flush();
+                    F.Close();
+                    Net_DB.addsensorad(intDeviceID, DateTime.Now.ToString(), path);
+                    return "OK";
+                }
+                else
+                {
+
+                    string path = @"D:\\Data\\" + filename + ".dat";
+                    FileStream F = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    F.Write(fileStartAndEnd, 0, 1);
+                    F.Write(bytes, 0, bytes.Length);
+                    F.Write(fileStartAndEnd, 1, 1);
+                    F.Flush();
+                    F.Close();
+                    Net_DB.addsensorad(intDeviceID, DateTime.Now.ToString(), path);
+                    return "OK";
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return "Fail";
+            }
         }
 
         #endregion 保存文件
@@ -1024,40 +1159,18 @@ namespace pipemonitor
         //构造ADcmd
         public byte[] SetADcmd(int bulkCount)
         {
-            byte[] Cmd = new byte[] { 0xA5, 0xA5, 0x23, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x06, 0x02, 0x57, 0xFF, 0xFF, 0x03, 0xE8, 0xFF, 0x5A, 0x5A };
+            byte[] Cmd = cmdItem.CmdADPacket;
             byte[] bytesbulkCount = new byte[2];
             bytesbulkCount = intToBytes(bulkCount);
 
             Cmd[11] = bytesbulkCount[0];
             Cmd[12] = bytesbulkCount[1];
 
-            if (Cmd[11] == 0x00 && Cmd[12] == 0x3A)
-            {
-                Cmd[11] = 0x03;
-                Cmd[12] = 0x0A;
-            }
-            else if (Cmd[11] == 0x01 && Cmd[12] == 0x3A)
-            {
-                Cmd[11] = 0x13;
-                Cmd[12] = 0x0A;
-            }
-            else if (Cmd[11] == 0x02 && Cmd[12] == 0x3A)
-            {
-                Cmd[11] = 0x23;
-                Cmd[12] = 0x0A;
-            }
-            string strtest = byteToHexStr(Cmd);
             return (Cmd);
         }
         #endregion AD采样
 
         #region 定时器
-        /*//发送定时器
-        public void SendTimer()
-        {    
-            
-        }*/
-
         //定时发送命令
         public void SendCmdOnTime(object source, ElapsedEventArgs e)
         {
@@ -1071,7 +1184,7 @@ namespace pipemonitor
                         switch (dataitem.CmdNum)
                         {
                             case 0:
-                                SendCmdSingle(cmdItem.CmdReadGpsTime, dataitem.byteDeviceID, dataitem.socket, dataitem.CmdbulkHex & 0x01);
+                                SendCmdSingle(cmdItem.CmdReadCapTime, dataitem.byteDeviceID, dataitem.socket, dataitem.CmdbulkHex & 0x01);
                                 break;
                             case 1:
                                 byte[] cmdCapTime = cmdItem.CmdSetCapTime;
@@ -1087,20 +1200,6 @@ namespace pipemonitor
                                 cmdSetOpenAndCloseTime[12] = (byte)(2 * dataitem.CloseTime & 0xFF);
                                 SendCmdSingle(cmdSetOpenAndCloseTime, dataitem.byteDeviceID, dataitem.socket, dataitem.CmdbulkHex & 0x04);
                                 break;
-                            /*case 2:
-                                byte[] cmdSetOpenTime = cmdItem.CmdSetOpenTime;
-                                cmdSetOpenTime[9] = (byte)(dataitem.OpenTime >> 8);
-                                cmdSetOpenTime[10] = (byte)(dataitem.OpenTime & 0xFF);
-                                SendCmdSingle(cmdSetOpenTime, dataitem.byteDeviceID, dataitem.socket, dataitem.CmdbulkHex & 0x04);
-                                break;
-                            case 3:
-                                byte[] cmdSetCloseTime = cmdItem.CmdSetCloseTime;
-                                cmdSetCloseTime[9] = (byte)(dataitem.CloseTime >> 8);
-                                cmdSetCloseTime[10] = (byte)(dataitem.CloseTime & 0xFF);
-                                SendCmdSingle(cmdSetCloseTime, dataitem.byteDeviceID, dataitem.socket, dataitem.CmdbulkHex & 0x08);
-                                break;*/
-                            //case 4:
-                            //SendCmdSingle(cmdItem.CmdADNow, dataitem.byteDeviceID, dataitem.socket, dataitem.CmdbulkHex & 0x10);
                             //break;
                             default:
                                 //

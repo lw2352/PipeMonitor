@@ -322,7 +322,9 @@
   <ItemGroup>
     <Content Include="log4net.config" />
     <None Include="Properties\PublishProfiles\1.pubxml" />
+    <None Include="Properties\PublishProfiles\lw.pubxml" />
     <None Include="Properties\PublishProfiles\test.pubxml" />
+    <None Include="Properties\PublishProfiles\配置文件1.pubxml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
