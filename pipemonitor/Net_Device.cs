@@ -29,7 +29,7 @@ namespace pipemonitor
         public byte[] byteDeviceID; //这个是设备的ID的byte数组
         public int intDeviceID;    //转化为int后的ID
         public int currentsendbulk; //当前发送的包数
-        //public int totalsendbulk; //总发送的包数
+        
         public Socket socket;   //Socket of the client
         public bool isSendDataToServer;//发送数据到服务器
         //public bool isChoosed;
@@ -53,24 +53,24 @@ namespace pipemonitor
 
     public class CmdItem
     {
+        //(数据位用0xFF填充)
+        //上传AD数据包--0x23
+        public byte[] CmdADPacket = new byte[] { 0xA5, 0xA5, 0x23, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x06, 0x02, 0x57, 0xFF, 0xFF, 0x03, 0xE8, 0xFF, 0x5A, 0x5A };
+        //读取/设定GPS采样时间,byte[9]是小时，byte[10]是分钟--0x25
         public byte[] CmdReadGpsTime = new byte[] { 0xA5, 0xA5, 0x25, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x04, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x5A, 0x5A };//读取GPS采样时间
         public byte[] CmdSetCapTime = new byte[] { 0xA5, 0xA5, 0x25, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x04, 0x0A, 0x1E, 0x00, 0x00, 0xFF, 0x5A, 0x5A }; //设定GPS采样时间,byte[9]是小时，byte[10]是分钟
-        //public byte[] CmdSetOpenTime  = new byte[] { 0xA5, 0xA5, 0x26, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x02, 0xFF, 0xFF, 0xFF, 0x5A, 0x5A };//设置开启时长
-        //public byte[] CmdSetCloseTime = new byte[] { 0xA5, 0xA5, 0x27, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x02, 0x00, 0x00, 0xFF, 0x5A, 0x5A };//设置关闭时长
-        //public byte[] CmdADNow        = new byte[] { 0xA5, 0xA5, 0x22, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x01, 0xFF, 0xFF, 0x5A, 0x5A };//立即采样
+        //设置开启和关闭时长--0x26
         public byte[] CmdSetOpenAndCloseTime = new byte[] { 0xA5, 0xA5, 0x26, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x04, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x5A, 0x5A };//设置开启和关闭时长
     }
 
     public class Net_Device
     {
-        //public delegate void UpdateStatusDelegate(string status);//使用安全方法来更新控件
-        //public string IP = "192.168.1.104";//服务端的IP地址
-        public string IP = "120.25.229.254";//服务端的IP地址
+        public string IP = "192.168.3.43";//服务端的IP地址
+        //public string IP = "120.25.229.254";//服务端的IP地址
         public int Port = 8085; //服务器端口地址
         //public int Port = 8080;
-        //public byte[] buffer = new byte[1002]; //临时缓冲区
-        //public byte[] buffer = new byte[1008]; //临时缓冲区
-        public int perPackageLength = 1008;//每包的长度
+
+        public int perPackageLength = 1009;//每包的长度
         public static int g_datafulllength = 600000; //完整数据包的一个长度
         public static int g_totalPackageCount = 600; //600个包
         public static Hashtable htClient = new Hashtable(); //创建一个Hashtable实例，保存所有设备信息，key存储是ID号，value是DataItem;
@@ -90,7 +90,7 @@ namespace pipemonitor
                 //初始化定时器
                 cmdTimer.Interval = 5000; //执行间隔时间,单位为毫秒; 这里为5秒  
                 cmdTimer.Elapsed += new System.Timers.ElapsedEventHandler(SendCmdOnTime);
-
+                //绑定服务端的监听socket
                 ServerSocket = new Socket(AddressFamily.InterNetwork,
                                                  SocketType.Stream,
                                                  ProtocolType.Tcp);
@@ -100,7 +100,7 @@ namespace pipemonitor
 
                 //Bind and listen on the given address
                 ServerSocket.Bind(ipEndPoint);
-                ServerSocket.Listen(8080);
+                ServerSocket.Listen(100);//侦听队列长度
 
                 //Accept the incoming clients
                 ServerSocket.BeginAccept(new AsyncCallback(OnAccept), null);
@@ -119,7 +119,6 @@ namespace pipemonitor
 
         public void CloseServer()
         {
-            //ServerSocket.Close();//用循环关闭哈希表中的socket
             try
             {
                 foreach (DictionaryEntry de in htClient)
@@ -247,15 +246,13 @@ namespace pipemonitor
                                 dataitem.CmdNum = olddataitem.CmdNum;//继承旧属性
                                 dataitem.SingleBuffer = new byte[perPackageLength];
                                 dataitem.strAddress = strAddress;
-                                //cfg = Net_DB.readsensorcfg(intdeviceID);//从数据库读取设备的配置参数
-                                //if (cfg != null)
-                                //{
+
                                 dataitem.CmdbulkHex = olddataitem.CmdbulkHex;//要发送的命令数目--16进制//继承旧属性
                                 dataitem.CapTimeHour = olddataitem.CapTimeHour;//继承旧属性
                                 dataitem.CapTimeMinute = olddataitem.CapTimeMinute;//继承旧属性
                                 dataitem.OpenTime = olddataitem.OpenTime;//继承旧属性
                                 dataitem.CloseTime = olddataitem.CloseTime;//继承旧属性
-                                //}
+                                
                                 htClient.Remove(oldAddress);//删除旧地址的键值对
                                 htClient[strAddress] = dataitem;
 
@@ -314,11 +311,7 @@ namespace pipemonitor
                         System.Diagnostics.Debug.WriteLine("读取GPS当前时间成功");
                         Log.Debug("设备号为" + dataitem.intDeviceID + "读取GPS当前时间成功");
                     }
-                    /*if (checkIsOpenTimeSetOK())
-                    {
-                        dataitem.CmdNum++;
-                        System.Diagnostics.Debug.WriteLine("开启时长设置成功");
-                    }*/
+
                     if (checkIsOpenAndCloseTime(dataitem.SingleBuffer))
                     {
                         dataitem.CmdNum++;
@@ -331,7 +324,6 @@ namespace pipemonitor
                     }
                     if (checkIsADstart(dataitem.SingleBuffer))
                     {
-                        //dataitem.CmdNum++;
                         System.Diagnostics.Debug.WriteLine("AD采样开始");
                     }
 
@@ -432,8 +424,7 @@ namespace pipemonitor
                     }
 
                     if (checkIsAllOffLine())//add 5-11
-                    {
-                        //cmdTimer.Stop();
+                    {                       
                         htClient.Clear();
                         Log.Debug("清空哈希表");
                     }
@@ -996,7 +987,7 @@ namespace pipemonitor
         //构造暂时关闭时长命令
         public byte[] CmdSetTempCloseTime(int group, string address)
         {
-            byte[] Cmd = cmdItem.CmdSetOpenAndCloseTime; ;//设置暂时关闭时长
+            byte[] Cmd = cmdItem.CmdSetOpenAndCloseTime;//设置暂时关闭时长
             byte[] bytetime = new byte[2];
             DataItem dataitem = (DataItem)htClient[address];
             Cmd[9] = (byte)(2 * dataitem.OpenTime >> 8);
@@ -1031,21 +1022,6 @@ namespace pipemonitor
             Cmd[11] = bytesbulkCount[0];
             Cmd[12] = bytesbulkCount[1];
 
-            if (Cmd[11] == 0x00 && Cmd[12] == 0x3A)
-            {
-                Cmd[11] = 0x03;
-                Cmd[12] = 0x0A;
-            }
-            else if (Cmd[11] == 0x01 && Cmd[12] == 0x3A)
-            {
-                Cmd[11] = 0x13;
-                Cmd[12] = 0x0A;
-            }
-            else if (Cmd[11] == 0x02 && Cmd[12] == 0x3A)
-            {
-                Cmd[11] = 0x23;
-                Cmd[12] = 0x0A;
-            }
             string strtest = byteToHexStr(Cmd);
             return (Cmd);
         }
