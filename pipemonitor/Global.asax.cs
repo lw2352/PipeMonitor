@@ -21,7 +21,7 @@ namespace pipemonitor
 
             // 在应用程序启动时运行的代码
             // MySQLDB.InitDb();
-            NetMethod.OpenServer("120.25.229.254", 8085);//开启端口监听服务
+            NetMethod.OpenServer("192.168.3.43", 8085);//开启端口监听服务
             //form1.OpenServer();
         }
 
